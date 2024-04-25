@@ -69,8 +69,9 @@ main:
         
     # YOUR CODE GOES HERE!!!!!!
     jal puzzle_part
-    jal part_one
-    
+    # jal part_one
+    jal circle_shoot
+
 loop: # Once done, enter an infinite loop so that your bot can be graded by QtSpimbot once 10,000,000 cycles have elapsed
     j loop
 
@@ -163,6 +164,59 @@ skip_s_loop:
     j large_loop
 skip_large_loop:
     jr $ra
+
+
+circle_shoot:
+    # shoot right
+    li $t1, 1
+    sw $t1, CHARGE_SHOT
+    lw $t2, TIMER
+    add $t2, $t2, 10000 
+cs_loop:
+    lw $t3, TIMER
+    bge $t3, $t2, skip_cs
+    j cs_loop
+skip_cs:
+    li $t2, 0
+    sw $t2, SHOOT
+   # shoot down
+    li $t1, 2
+    sw $t1, CHARGE_SHOT
+    lw $t2, TIMER
+    add $t2, $t2, 10000 
+cs_loop2:
+    lw $t3, TIMER
+    bge $t3, $t2, skip_cs2
+    j cs_loop2
+skip_cs2:
+    li $t2, 0
+    sw $t2, SHOOT
+
+# shoot left
+    li $t1, 3
+    sw $t1, CHARGE_SHOT
+    lw $t2, TIMER
+    add $t2, $t2, 10000 
+cs_loop3:
+    lw $t3, TIMER
+    bge $t3, $t2, skip_cs3
+    j cs_loop3
+skip_cs3:
+    li $t2, 0
+    sw $t2, SHOOT
+
+# shoot up
+    li $t1, 4
+    sw $t1, CHARGE_SHOT
+    lw $t2, TIMER
+    add $t2, $t2, 10000 
+cs_loop4:
+    lw $t3, TIMER
+    bge $t3, $t2, skip_cs4
+    j cs_loop4
+skip_cs4:
+    li $t2, 0
+    sw $t2, SHOOT
     
 
 .kdata
