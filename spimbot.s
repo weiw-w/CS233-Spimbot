@@ -70,7 +70,15 @@ main:
     # YOUR CODE GOES HERE!!!!!!
     jal puzzle_part
     # jal part_one
-    jal circle_shoot
+    jal vertical_loop
+
+test: 
+    li $t1, 0
+    sw $t1, ANGLE
+    li $t1, 1
+    sw $t1, ANGLE_CONTROL
+    li $t2, 10
+    sw $t2, VELOCITY
 
 loop: # Once done, enter an infinite loop so that your bot can be graded by QtSpimbot once 10,000,000 cycles have elapsed
     j loop
@@ -126,17 +134,35 @@ skip_loop2:
     li $t2, 0
     sw $t2, SHOOT
 
-    # test new thing 
-    # set direction
-    #li $t2, 0
-    #sw $t2, ANGLE
-    #li $t2, 1
-    #sw $t2, ANGLE_CONTROL
 
-    li $t1, 0 # i 
-large_loop:
-    bge $t1, 4, skip_large_loop
-    li $t2, 8
+vertical_loop:
+    # get bullets first
+    jal puzzle_part
+    # check if it is at position 3 
+    lw $t1, BOT_Y # x position
+    bge $t1, 48, bottom
+    # going downward
+    li $t1, 90
+    sw $t1, ANGLE
+    li $t1, 1
+    sw $t1, ANGLE_CONTROL
+    li $a0, 0
+    jal moving
+    j vertical_loop
+bottom:
+    # going upward
+    li $t1, 270
+    sw $t1, ANGLE
+    li $t1, 1
+    sw $t1, ANGLE_CONTROL
+    li $a0, 0
+    jal moving
+    j vertical_loop 
+ 
+ 
+moving:
+    bge $a0, 2, skip_move
+    li $t2, 10
     sw $t2, VELOCITY
     lw $t2, TIMER
     add $t2, $t2, 24000
@@ -145,26 +171,22 @@ move_loop:
     bge $t3, $t2, skip_m_loop
     j move_loop
 skip_m_loop:
-    #stop
+    # stop
     li $t2, 0
     sw $t2, VELOCITY
-    # shoot down
-    li $t2, 2
-    sw $t2, CHARGE_SHOT
-    lw $t2, TIMER
-    add $t2, $t2, 10000 
-s_loop:
-    lw $t3, TIMER
-    bge $t3, $t2, skip_s_loop
-    j s_loop
-skip_s_loop:
-    li $t2, 0
-    sw $t2, SHOOT
-    add $t1, $t1, 1
-    j large_loop
-skip_large_loop:
-    jr $ra
 
+    # circle_shoot
+    sub $sp, $sp, 8
+    sw $ra, 0($sp)
+    sw $a0, 4($sp)
+    jal circle_shoot
+
+    lw $ra, 0($sp)
+    lw $a0, 4($sp)
+    add $a0, $a0, 1
+    j moving
+skip_move:
+    jr $ra
 
 circle_shoot:
     # shoot right
@@ -217,6 +239,7 @@ cs_loop4:
 skip_cs4:
     li $t2, 0
     sw $t2, SHOOT
+    jr $ra
     
 
 .kdata
