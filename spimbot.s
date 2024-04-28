@@ -63,12 +63,12 @@ main:
         
     # YOUR CODE GOES HERE!!!!!!
     jal puzzle_part
-    jal vertical_loop
-
+    jal circle_shoot
     lw $t0, BOT_X
     lw $t1, top_left_X
     beq $t0, $t1, left_top
     j right_bot
+    jal vertical_loop
 
 loop: # Once done, enter an infinite loop so that your bot can be graded by QtSpimbot once 10,000,000 cycles have elapsed
     j loop
@@ -97,40 +97,12 @@ skip:
     add $sp, $sp, 4
     jr $ra
 
-
-part_one:
-    li $t1, 1
-    sw $t1, CHARGE_SHOT
-    lw $t2, TIMER
-    add $t2, $t2, 10000 
-c_loop:
-    lw $t3, TIMER
-    bge $t3, $t2, skip_loop
-    j c_loop
-skip_loop:
-    li $t2, 0
-    sw $t2, SHOOT
-
-    # shoot down
-    li $t1, 2
-    sw $t1, CHARGE_SHOT
-    lw $t2, TIMER
-    add $t2, $t2, 10000 
-c_loop2:
-    lw $t3, TIMER
-    bge $t3, $t2, skip_loop2
-    j c_loop2
-skip_loop2:
-    li $t2, 0
-    sw $t2, SHOOT
-
-
 vertical_loop:
     # get bullets first
     jal puzzle_part
     # check if it is at position 3 
-    lw $t1, BOT_Y # x position
-    bge $t1, 48, bottom
+    lw $t1, BOT_Y # y position
+    bge $t1, 112, bottom
     # going downward
     li $t1, 90
     sw $t1, ANGLE
@@ -151,8 +123,22 @@ bottom:
  
  
 moving:
-    bge $a0, 2, skip_move
-    li $t2, 10
+    bge $a0, 7, skip_move
+    bne $a0, 4, skip_solve
+    sub $sp, $sp, 8
+    sw $ra, 0($sp)
+    sw $a0, 4($sp)
+    jal puzzle_part
+    lw $ra, 0($sp)
+    lw $a0, 4($sp)
+skip_solve:
+    # circle_shoot
+    sub $sp, $sp, 4
+    sw $ra, 0($sp)
+    jal circle_shoot
+    lw $ra, 0($sp)
+    
+    li $t2, 12
     sw $t2, VELOCITY
     lw $t2, TIMER
     add $t2, $t2, 24000
@@ -173,6 +159,7 @@ skip_m_loop:
 
     lw $ra, 0($sp)
     lw $a0, 4($sp)
+    add $sp, $sp, 8
     add $a0, $a0, 1
     j moving
 skip_move:
@@ -259,7 +246,7 @@ left_top:
         sw $0, VELOCITY
         jal circle_shoot
         jal circle_shoot
-        j loop
+        j vertical_loop
 right_bot:
     lw $t0, BOT_Y
     sub $t0, $t0, 51
@@ -287,7 +274,7 @@ right_bot:
         bne $t2, $t0, loop2_right_bot
         sw $0, VELOCITY
         jal circle_shoot
-        j loop
+        j vertical_loop
 
 .kdata
 chunkIH:    .space 40
