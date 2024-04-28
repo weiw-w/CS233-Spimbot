@@ -43,6 +43,8 @@ puzzle_received: .word 0
 ### Puzzle
 board:     .space 512
 top_left_X: .word 0x1c
+### restart 
+restart: .word 0
 
 # If you want, you can use the following to detect if a bonk has happened.
 has_bonked: .byte 0
@@ -62,13 +64,13 @@ main:
     
         
     # YOUR CODE GOES HERE!!!!!!
+start:
     jal puzzle_part
     jal circle_shoot
     lw $t0, BOT_X
     lw $t1, top_left_X
     beq $t0, $t1, left_top
     j right_bot
-    jal vertical_loop
 
 loop: # Once done, enter an infinite loop so that your bot can be graded by QtSpimbot once 10,000,000 cycles have elapsed
     j loop
@@ -98,6 +100,14 @@ skip:
     jr $ra
 
 vertical_loop:
+    # check if being respawn
+    la $t1, restart
+    lw $t1, 0($t1)
+    beq $t1, $0, continue
+    li $t1, 0
+    sw $t1, restart
+    j start
+continue:
     # get bullets first
     jal puzzle_part
     # check if it is at position 3 
@@ -355,6 +365,8 @@ request_puzzle_interrupt:
 respawn_interrupt:
     sw      $0, RESPAWN_ACK
     #Fill in your respawn handler code here
+    li $t0, 1
+    sw $t0, restart
     j       interrupt_dispatch
 
 non_intrpt:                         # was some non-interrupt
