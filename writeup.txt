@@ -1,1 +1,25 @@
 <Explain your team's strategy, implementation, etc.>
+
+Our strategy:
+    Since shooting the other bot can earn much more points, so that will be our main focus. We first 
+    observe the map and find out the crucial traffic pivot of the map, the very center of the map.
+    This road connects the left part and the right part of the map, so we decide to occupy this area
+    to prevent the adversary from going from this area to our side and killing our bot. To implement our 
+    strategy, we first check out the spawning position first and then move our bot to the top/bottom 
+    coordinate of the vertical aisle and move up and down, shooting charge bullets in all four 
+    directions, hoping to kill the adversary bot any time it enters the center area. 
+
+
+
+vertical_loop:
+    This function will only be called when the bot reaches the top or bottom of the center area from 
+    the two spawning points. By checking the Y-value of our bot, we can determine which direction it 
+    should move towards. With the MOVING function, the bot will move towards the given direction until 
+    it reaches the end. It will solve puzzles at the two ends and the middle and shoot around every three 
+    tiles.
+
+respawn logic: 
+    After respawning interrupt, we will assign a new variable RESTART to be 1. Since it won't be possible
+    for the other bot to shoot our bot before we reaching the center area, we decided to check RESTART 
+    every beginning of the VERTICAL_LOOP. We will jump back to our main program, if the competiton is 
+    restarted. 
