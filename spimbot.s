@@ -42,7 +42,7 @@ MMIO_STATUS             = 0xffff204c
 puzzle_received: .word 0
 ### Puzzle
 board:     .space 512
-#### Puzzle
+top_left_X: .word 0x1c
 
 # If you want, you can use the following to detect if a bonk has happened.
 has_bonked: .byte 0
@@ -60,25 +60,15 @@ main:
     or      $t4, $t4, 1 # global enable
     mtc0    $t4, $12
     
-    li $t1, 0
-    sw $t1, ANGLE
-    li $t1, 1
-    sw $t1, ANGLE_CONTROL
-    li $t2, 0
-    sw $t2, VELOCITY
         
     # YOUR CODE GOES HERE!!!!!!
     jal puzzle_part
-    # jal part_one
     jal vertical_loop
 
-test: 
-    li $t1, 0
-    sw $t1, ANGLE
-    li $t1, 1
-    sw $t1, ANGLE_CONTROL
-    li $t2, 10
-    sw $t2, VELOCITY
+    lw $t0, BOT_X
+    lw $t1, top_left_X
+    beq $t0, $t1, left_top
+    j right_bot
 
 loop: # Once done, enter an infinite loop so that your bot can be graded by QtSpimbot once 10,000,000 cycles have elapsed
     j loop
@@ -240,7 +230,64 @@ skip_cs4:
     li $t2, 0
     sw $t2, SHOOT
     jr $ra
-    
+
+left_top:
+    lw $t0, BOT_Y
+    add $t0, $t0, 51
+    li $t1, 90
+    sw $t1, ANGLE
+    li $t1, 1
+    sw $t1, ANGLE_CONTROL
+    li $t1, 10
+    sw $t1, VELOCITY
+    loop1_left_top:
+        lw $t2, BOT_Y
+        bne $t2, $t0, loop1_left_top
+        sw $0, VELOCITY
+        jal circle_shoot
+        li $t1, 0
+        sw $t1, ANGLE
+        li $t1, 1
+        sw $t1, ANGLE_CONTROL
+        li $t1, 10
+        sw $t1, VELOCITY
+        lw $t0, BOT_X
+        add $t0, $t0, 115
+    loop2_left_top:
+        lw $t2, BOT_X
+        bne $t2, $t0, loop2_left_top
+        sw $0, VELOCITY
+        jal circle_shoot
+        jal circle_shoot
+        j loop
+right_bot:
+    lw $t0, BOT_Y
+    sub $t0, $t0, 51
+    li $t1, 270
+    sw $t1, ANGLE
+    li $t1, 1
+    sw $t1, ANGLE_CONTROL
+    li $t1, 10
+    sw $t1, VELOCITY
+    loop1_right_bot:
+        lw $t2, BOT_Y
+        bne $t2, $t0, loop1_right_bot
+        sw $0, VELOCITY
+        jal circle_shoot
+        li $t1, 180
+        sw $t1, ANGLE
+        li $t1, 1
+        sw $t1, ANGLE_CONTROL
+        li $t1, 10
+        sw $t1, VELOCITY
+        lw $t0, BOT_X
+        sub $t0, $t0, 119
+    loop2_right_bot:
+        lw $t2, BOT_X
+        bne $t2, $t0, loop2_right_bot
+        sw $0, VELOCITY
+        jal circle_shoot
+        j loop
 
 .kdata
 chunkIH:    .space 40
