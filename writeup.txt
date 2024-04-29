@@ -9,7 +9,8 @@ Our strategy:
     coordinate of the vertical aisle and move up and down, shooting charge bullets in all four 
     directions, hoping to kill the adversary bot any time it enters the center area. 
 
-
+For top_left and right_bot parts, we make the bot circle_shoot first and then move down to the desired Y coordinate. 
+After that, we perform another circle_shoot to clear the blocks in the path and then move to the desired position.
 
 vertical_loop:
     This function will only be called when the bot reaches the top or bottom of the center area from 
